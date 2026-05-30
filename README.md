@@ -1,29 +1,67 @@
-# LendFlow | Loan Management System
+<div align="center">
 
-LendFlow is a modern, high-end, production-grade **Loan Management System (LMS)** built as a CreditSea technical assignment. 
+# 🏦 LendFlow
+### *Loan Management System*
 
-It provides an end-to-end sandbox representing a lending platform where borrowers can register, fill details, undergo an instant Business Rule Engine (BRE) eligibility audit, upload income slips, select custom sliders for loan calculations, and track approval processes. Simultaneously, an **Operations Dashboard** gives internal executives (Sales, Sanction, Disbursement, and Collection) role-based views to guide applications through their respective lifecycles.
+> A modern, production-grade LMS built as a CreditSea technical assignment — covering the full journey from borrower registration to loan settlement.
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-97.5%25-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Frontend-Next.js-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Express](https://img.shields.io/badge/Backend-Express.js-green?style=flat-square&logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
+
+</div>
 
 ---
 
+## 📌 Table of Contents
 
+1. [What is LendFlow?](#-what-is-lendflow)
+2. [System Architecture](#-system-architecture)
+3. [Loan Lifecycle](#-loan-lifecycle)
+4. [Business Rule Engine (BRE)](#-business-rule-engine-bre)
+5. [Role-Based Access](#-role-based-access)
+6. [Sandbox Credentials](#-sandbox-tester-credentials)
+7. [Testing Walkthrough](#-evaluator-testing-walkthrough)
+8. [Running Locally](#-running-the-project-locally)
+9. [Schema & Architecture Specs](#-schema--architecture-specifications)
 
-## 📊 System Visualizations & Diagrams
+---
 
-Below are the architectural and lifecycle flows designed for the LendFlow platform (configured locally):
+## 💡 What is LendFlow?
 
-### 1. System Architecture Flow
-```mermaid
+LendFlow is a full-stack **Loan Management System** that simulates a real-world lending platform end-to-end.
+
+**Borrowers** can:
+- Register and fill in KYC details
+- Undergo an instant BRE eligibility audit
+- Upload salary slips and configure loan parameters via sliders
+- Track their loan approval status in real time
+
+**Operations Staff** can access a role-based dashboard covering:
+
+| Department | Responsibility |
+|---|---|
+| 🧑‍💼 Sales | Track leads and pre-application stages |
+| ✅ Sanction | Review and approve/reject loan applications |
+| 💸 Disbursement | Release funds for sanctioned loans |
+| 🗂️ Collection | Record repayments and manage loan closures |
+
+---
+
+## 🏗 System Architecture
+
+```
 flowchart TB
     subgraph FE["🖥️ Frontend — Next.js :3000"]
-        BP["Borrower portal\nMulti-step wizard · Status tracker"]
-        OD["Operations dashboard\nSales · Sanction · Disburse · Collection"]
+        BP["Borrower Portal\nMulti-step wizard · Status tracker"]
+        OD["Operations Dashboard\nSales · Sanction · Disburse · Collection"]
     end
 
     subgraph BE["⚙️ Backend — Express API :5001"]
-        AUTH["Auth service\nJWT · role guard"]
+        AUTH["Auth Service\nJWT · role guard"]
         LOAN["Loan API\nCRUD · lifecycle"]
-        BRE["BRE engine\nAge · Salary · PAN · Employment"]
+        BRE["BRE Engine\nAge · Salary · PAN · Employment"]
         PAY["Payments API\nUTR · auto-close"]
     end
 
@@ -47,8 +85,20 @@ flowchart TB
     PAY -->|auto-close check| L
 ```
 
-### 2. End-to-End Loan Lifecycle
-```mermaid
+---
+
+## 🔄 Loan Lifecycle
+
+Every loan follows a strict progression through these states:
+
+```
+PRE_APPLIED → APPLIED → SANCTIONED → DISBURSED → CLOSED
+                                   ↘ REJECTED
+```
+
+Here is the full end-to-end flow:
+
+```
 flowchart TD
     A([Borrower registers]) --> B[Enter KYC details\nAge · Salary · PAN · Employment]
     B --> C{BRE audit\nserver-side}
@@ -80,8 +130,13 @@ flowchart TD
     style N fill:#ffedd5,stroke:#f97316,color:#7c2d12
 ```
 
-### 3. Business Rule Engine (BRE) Eligibility Flow
-```mermaid
+---
+
+## 🤖 Business Rule Engine (BRE)
+
+The BRE runs **server-side** at KYC submission and instantly blocks ineligible applicants, listing every failed rule.
+
+```
 flowchart TD
     START([KYC submitted]) --> R1
 
@@ -109,140 +164,230 @@ flowchart TD
     style F4 fill:#fee2e2,stroke:#ef4444,color:#7f1d1d
     style OK fill:#dcfce7,stroke:#22c55e,color:#14532d
 ```
+
+**BRE Rules at a glance:**
+
+| Rule | Criteria |
+|---|---|
+| 🎂 Age | Must be between **23 and 50** (calculated from DOB) |
+| 💰 Salary | Net monthly income must be **≥ ₹25,000** |
+| 🪪 PAN | Must match `^[A-Z]{5}[0-9]{4}[A-Z]{1}$` |
+| 💼 Employment | Must **not** be unemployed |
+
+---
+
+## 👥 Role-Based Access
+
+Each staff role sees only their part of the operations dashboard:
+
+```
+flowchart LR
+    Admin["🔑 Admin\nadmin@lendflow.com"] --> S & SA & D & C
+
+    S["🧑‍💼 Sales\nsales@lendflow.com\n\nViews pre-application leads"]
+    SA["✅ Sanction\nsanction@lendflow.com\n\nApproves or rejects\nAPPLIED loans"]
+    D["💸 Disbursement\ndisbursement@lendflow.com\n\nReleases funds for\nSANCTIONED loans"]
+    C["🗂️ Collection\ncollection@lendflow.com\n\nRecords UTR payments\nTriggers auto-close"]
+
+    style Admin fill:#fef9c3,stroke:#eab308,color:#713f12
+    style S fill:#e0f2fe,stroke:#0ea5e9,color:#0c4a6e
+    style SA fill:#f3e8ff,stroke:#a855f7,color:#3b0764
+    style D fill:#ffedd5,stroke:#f97316,color:#7c2d12
+    style C fill:#dcfce7,stroke:#22c55e,color:#14532d
+```
+
 ---
 
 ## 🔑 Sandbox Tester Credentials
 
-A database seed script automatically prepares pre-created accounts for all roles with dummy loans in various stages. 
+> All accounts share the password: **`Password123`**
 
-To test, log in using **`Password123`** as the password for all profiles:
-
-| Account Type / Role | Sandbox Email | Target Dashboard Module / View |
-| :--- | :--- | :--- |
-| **System Administrator** | `admin@lendflow.com` | Access **ALL** modules (Sales, Sanction, Disburse, Collection) |
-| **Sales Executive** | `sales@lendflow.com` | Lead tracking (registered borrowers in pre-application stages) |
-| **Sanction Underwriter** | `sanction@lendflow.com` | Approve or Decline applied loans (review salary slips) |
-| **Disbursement Officer** | `disbursement@lendflow.com` | Release funds for approved/sanctioned applications |
-| **Collection Executive** | `collection@lendflow.com` | Repayment ledger (record payments with UTR, auto-close check) |
-| **Borrower (Pending)** | `borrower2@lendflow.com` | Pre-applied loan in **APPLIED** stage (review-pending tracker) |
-| **Borrower (Active)** | `borrower4@lendflow.com` | Active loan in **DISBURSED** stage (in-repayment tracker) |
+| Role | Email | What to Test |
+|---|---|---|
+| 🔑 **System Administrator** | `admin@lendflow.com` | Access ALL modules |
+| 🧑‍💼 **Sales Executive** | `sales@lendflow.com` | Lead tracking (pre-application stages) |
+| ✅ **Sanction Underwriter** | `sanction@lendflow.com` | Approve or decline applied loans |
+| 💸 **Disbursement Officer** | `disbursement@lendflow.com` | Release funds for sanctioned applications |
+| 🗂️ **Collection Executive** | `collection@lendflow.com` | Record payments with UTR, auto-close |
+| ⏳ **Borrower (Pending)** | `borrower2@lendflow.com` | Loan in APPLIED stage |
+| ✅ **Borrower (Active)** | `borrower4@lendflow.com` | Loan in DISBURSED stage |
 
 ---
 
-## 🚶‍♂️ Evaluator Testing Walkthrough (Test in 2 Minutes!)
+## 🚶 Evaluator Testing Walkthrough
 
-To experience the complete loan lifecycle from **Request ➔ Approval ➔ Disbursement ➔ Repayment Settlement**, follow this step-by-step walkthrough:
+Follow these 4 steps to experience the **complete loan lifecycle in ~2 minutes**.
 
-### Step 1: Create a Borrower Application
-1. Open **[http://localhost:3000](http://localhost:3000)** and go to **Sign In**.
-2. Register a new account (e.g. `alex@lendflow.com`) or log in as a borrower.
+---
+
+### Step 1 — Create a Borrower Application
+
+1. Go to `http://localhost:3000` → **Sign In**
+2. Register a new account (e.g. `alex@lendflow.com`) or log in as a borrower
 3. On **Step 2 (Eligibility)**, enter KYC details:
-   - DOB: `1995-05-10` (Age must be 23–50)
-   - Salary: `₹45,000` (Salary must be ₹25,000+)
-   - PAN: `ABCDE1234F` (Alphanumeric regex checked)
+   - DOB: `1995-05-10` *(age must be 23–50)*
+   - Salary: `₹45,000` *(must be ₹25,000+)*
+   - PAN: `ABCDE1234F` *(alphanumeric regex checked)*
    - Employment: `Salaried`
-   - *Note: If you enter invalid inputs (e.g., Unemployed or ₹15k salary), the Business Rule Engine (BRE) alert will instantly block you and list the exact failed rules!*
-4. Click **Validate**. Watch the live rule scanning audit animation pass and advance.
-5. On **Step 3 (Salary Slip)**, drag and drop any test image/PDF (Max 5MB) and upload it.
-6. On **Step 4 (Configure)**, use the sliders to select **₹2,50,000** for **180 Days**. The live panel will instantly calculate the 12% p.a. simple interest. Click **Submit**.
-7. The portal switches to the **Approval Status** screen showing your loan as **`APPLIED`** (Pending Review). Log out.
+   > 💡 Try entering invalid inputs (e.g. Unemployed or ₹15k salary) — the BRE will instantly block and list the exact failed rules!
+4. Click **Validate** — watch the live rule scanning animation pass
+5. On **Step 3 (Salary Slip)**, drag and drop any test image/PDF *(Max 5MB)*
+6. On **Step 4 (Configure)**, select **₹2,50,000** for **180 Days** using the sliders — the live panel calculates the 12% p.a. simple interest. Click **Submit**
+7. Status screen shows loan as **`APPLIED`** — log out
 
-### Step 2: Underwrite & Sanction the Loan
-1. Go to the Sign In page and click the **Sanction** profile from the Sandbox Panel (fills `sanction@lendflow.com` / `Password123` instantly).
-2. In your queue, you will see `alex@lendflow.com`'s application.
-3. Click **"View / Download Salary Slip"** to verify their income proof.
-4. Click **Approve & Sanction**. The loan status updates to `SANCTIONED`! Log out.
+---
 
-### Step 3: Disburse the Funds
-1. Click the **Disbursement** profile from the Sandbox Panel (fills `disbursement@lendflow.com` / `Password123`).
-2. In your **Disbursement Queue** tab, you will see the sanctioned loan waiting.
-3. Click **Release Funds**. The loan is dispatched, status updates to `DISBURSED`, and is now active! Log out.
+### Step 2 — Underwrite & Sanction the Loan
 
-### Step 4: Record Payments & Auto-Close
-1. Click the **Collection** profile from the Sandbox Panel (fills `collection@lendflow.com` / `Password123`).
-2. In the **Collections Ledger**, you will see the active loan showing outstanding dues.
-3. Click **Record Payment**.
-4. Type in a unique transaction code (e.g. `UTR990088`) and log a partial payment of `₹1,00,000`. The outstanding balance decreases instantly!
-5. Log a final payment for the remaining balance. **Once the outstanding dues drop to ₹0, the system automatically transitions the loan status to `CLOSED`.**
-6. Log back in as your borrower (`alex@lendflow.com`). The status tracker immediately refreshes to a clean, settled state reading: **"Loan Closed & Settled - No outstanding dues!"**
+1. Log in as **Sanction** (`sanction@lendflow.com` / `Password123`)
+2. Find `alex@lendflow.com`'s application in your queue
+3. Click **"View / Download Salary Slip"** to verify income proof
+4. Click **Approve & Sanction** → status updates to `SANCTIONED` — log out
+
+---
+
+### Step 3 — Disburse the Funds
+
+1. Log in as **Disbursement** (`disbursement@lendflow.com` / `Password123`)
+2. Find the sanctioned loan in the **Disbursement Queue** tab
+3. Click **Release Funds** → status updates to `DISBURSED` — log out
+
+---
+
+### Step 4 — Record Payments & Auto-Close
+
+1. Log in as **Collection** (`collection@lendflow.com` / `Password123`)
+2. Open the **Collections Ledger** → find the active loan
+3. Click **Record Payment** → enter UTR code (e.g. `UTR990088`) and a partial amount of `₹1,00,000`
+4. Log a final payment for the remaining balance
+5. Once outstanding balance hits **₹0**, the loan auto-transitions to **`CLOSED`**
+6. Log back in as `alex@lendflow.com` — the tracker reads: **"Loan Closed & Settled - No outstanding dues!"**
+
+> Here's a visual of this repayment flow:
+
+```
+flowchart LR
+    REC["Collection Exec\nrecords payment\nwith UTR"] --> CHK{Outstanding\nbalance = 0?}
+    CHK -->|No| PART["Partial payment\nlogged — balance\ndecreases"]
+    PART --> REC
+    CHK -->|Yes| CLOSE["✅ Loan auto-closes\nStatus → CLOSED\nBorrower notified"]
+
+    style CLOSE fill:#dcfce7,stroke:#22c55e,color:#14532d
+    style PART fill:#e0f2fe,stroke:#0ea5e9,color:#0c4a6e
+```
 
 ---
 
 ## 🚀 Running the Project Locally
 
-### 1. Prerequisites
-- **Node.js** (v20 or higher is recommended).
-- **MongoDB** running locally (`mongodb://127.0.0.1:27017/lendflow`) or access to MongoDB Atlas.
+### Prerequisites
 
-### 2. Set Up Environment Variables
+- **Node.js** v20 or higher
+- **MongoDB** running locally at `mongodb://127.0.0.1:27017/lendflow` or a MongoDB Atlas connection string
 
-Create a `.env` file in the `backend/` directory:
+---
+
+### 1. Set Up Environment Variables
+
+**`backend/.env`**
 ```env
 PORT=5001
-MONGO_URI=your mongo connection string 
-JWT_SECRET=you secret key
+MONGO_URI=your_mongo_connection_string
+JWT_SECRET=your_secret_key
 ```
 
-Create a `.env.local` file in the `frontend/` directory (optional - defaults to localhost:5001):
+**`frontend/.env.local`** *(optional — defaults to localhost:5001)*
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5001/api
 ```
 
-### 3. Install & Seed Heuristics
+---
 
-Install all monorepo dependencies and run the seed script from the **root workspace directory**:
+### 2. Install Dependencies & Seed the Database
+
+Run from the **root workspace directory**:
 
 ```bash
 # Install root, backend, and frontend packages concurrently
 npm run install:all
 
-# Seed database with the evaluator test profiles listed above
+# Seed the database with evaluator test profiles
 npm run seed
 ```
 
-### 4. Start Development Servers
+---
 
-Start the servers inside each directory in separate terminal windows:
+### 3. Start Development Servers
 
-#### Terminal 1 (Backend API):
+Open two terminal windows:
+
+**Terminal 1 — Backend API**
 ```bash
 cd backend
 npm run dev
+# API starts at http://localhost:5001
 ```
-- **API Engine** will start on [http://localhost:5001](http://localhost:5001)
 
-#### Terminal 2 (Frontend Portal):
+**Terminal 2 — Frontend Portal**
 ```bash
-# Ensure Node 24 is loaded to match native compiler bindings
-nvm use 24
+nvm use 24   # Ensure Node 24 for native compiler bindings
 cd frontend
 npm run dev
+# Portal starts at http://localhost:3000
 ```
-- **LendFlow Portal** will start on [http://localhost:3000](http://localhost:3000)
 
-### 5. Running with Docker Compose (Instant Sandboxed Setup)
+---
 
-If you have Docker installed, you can skip the Node, npm, and NVM setups entirely and boot the entire fully integrated platform in a sandboxed container with a single command from your **root workspace directory**:
+### 4. (Alternative) Run with Docker
+
+Skip Node, npm, and NVM setup entirely — boot the full platform with one command:
 
 ```bash
 docker-compose up --build
 ```
-- **Next.js Frontend** will immediately compile and start on [http://localhost:3000](http://localhost:3000)
-- **Express Backend API** will boot and start on [http://localhost:5001](http://localhost:5001)
+
+| Service | URL |
+|---|---|
+| 🖥️ Next.js Frontend | `http://localhost:3000` |
+| ⚙️ Express Backend API | `http://localhost:5001` |
 
 ---
 
 ## 📐 Schema & Architecture Specifications
 
-### 1. Database Collections
-- **Users**: Handles logins, hashes passwords, and locks role classifications.
-- **Loans**: Integrates step records, salary file paths, calculated simple interest metrics (`SI = P * R * T / 36500`), and lifecycle statuses:
-  `PRE_APPLIED` ➔ `APPLIED` ➔ `SANCTIONED` ➔ `DISBURSED` ➔ `CLOSED` (or `REJECTED`).
-- **Payments**: Records transaction logs. Requires a **globally unique UTR** to prevent duplicates, and auto-calculates total paid vs loan repayment target to trigger automatic status closures.
+### Database Collections
 
-### 2. Business Rule Engine (BRE) Guidelines
-Run on the server for security during KYC personal detail submissions. Triggers rejection if:
-- **Age**: Outside the `23` to `50` bracket (calculated dynamically from DOB).
-- **Salary**: Net earnings fall below **₹25,000 / month**.
-- **PAN**: Does not match standard alphanumeric regex `^[A-Z]{5}[0-9]{4}[A-Z]{1}$`.
-- **Employment**: Applicant is marked as **Unemployed**.
+**Users**
+- Handles logins, hashed passwords, and role classifications
+
+**Loans**
+- Stores step records, salary file paths, and calculated simple interest:
+  ```
+  SI = P × R × T / 36500
+  ```
+- Tracks lifecycle status: `PRE_APPLIED` → `APPLIED` → `SANCTIONED` → `DISBURSED` → `CLOSED` (or `REJECTED`)
+
+**Payments**
+- Logs each transaction with a **globally unique UTR** to prevent duplicates
+- Auto-calculates total paid vs. repayment target to trigger automatic loan closure
+
+---
+
+### Simple Interest Calculation Flow
+
+```
+flowchart LR
+    IN["Borrower inputs\nPrincipal (P)\nTenure in days (T)\nRate = 12% p.a."] --> CALC["SI = P × R × T ÷ 36500"]
+    CALC --> OUT["Total Repayable\n= P + SI\nDisplayed on slider panel"]
+
+    style IN fill:#e0f2fe,stroke:#0ea5e9,color:#0c4a6e
+    style OUT fill:#dcfce7,stroke:#22c55e,color:#14532d
+```
+
+---
+
+<div align="center">
+
+Built with ❤️ by [isahilmishra](https://github.com/isahilmishra) · CreditSea Assignment
+
+</div>
