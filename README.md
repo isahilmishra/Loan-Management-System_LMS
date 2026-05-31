@@ -10,6 +10,8 @@
 [![Express](https://img.shields.io/badge/Backend-Express.js-green?style=flat-square&logo=express)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
 
+### 🎬 [Watch Demo Video](https://drive.google.com/file/d/1C7Z8QKNMpfErvI508quqElc6gU-oy7JH/view?usp=sharing)
+
 </div>
 
 ---
@@ -215,6 +217,8 @@ flowchart LR
 ---
 
 ## 🚶 Evaluator Testing Walkthrough
+
+> 🎬 **Prefer a visual overview first?** [Watch the full demo video](https://drive.google.com/file/d/1C7Z8QKNMpfErvI508quqElc6gU-oy7JH/view?usp=sharing) before going through the steps below.
 
 Follow these 4 steps to experience the **complete loan lifecycle in ~2 minutes**.
 
